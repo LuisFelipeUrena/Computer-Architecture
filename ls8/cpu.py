@@ -7,7 +7,23 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        pass
+        self.ram = [0] * 8
+        self.pc = 0
+        self.reg = [0] * 8
+    
+    
+    def ram_read(self,address):
+        '''
+        Read the information at the index in the RAM
+        '''
+        return print(self.ram[address])
+    
+    
+    def ram_write(self,value,address):
+        '''
+        Writes a value in ram given the specified index
+        '''
+        self.ram[address] = value    
 
     def load(self):
         """Load a program into memory."""
@@ -62,4 +78,27 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        running = True
+        self.pc = 0
+        
+        while running:
+            ir = self.ram[self.pc]
+            
+            
+            if ir == 130:
+                self.ram_write(8,0)
+                self.pc +=3
+            
+            if ir ==  71:
+                self.ram_read(0)
+                self.pc += 2
+            
+            if ir ==  1:
+                running = False
+            
+            else:
+                print('unknown instruction')    
+
+
+
+
