@@ -25,6 +25,18 @@ class CPU:
         Writes a value in ram given the specified index
         '''
         self.ram[address] = value    
+    def push(self,value):
+        
+        self.reg[self.sp] -= 1
+        top_stack = self.reg[self.sp]
+        self.ram[top_stack] = value
+
+    def pop(self):
+        top_stack = self.reg[self.sp]
+        value = self.ram[top_stack]
+        self.reg[self.sp] += 1
+        return value
+
 
     def load(self):
         """Load a program into memory."""
@@ -92,6 +104,10 @@ class CPU:
         HLT = 0b00000001
         PUSH = 0b01000101
         POP = 0b01000110
+        CALL = 0b01010000
+        RET = 0b00010001
+        
+
 
         
         while running:
@@ -120,23 +136,44 @@ class CPU:
 
             elif ir == POP:
                 reg_num = self.ram[self.pc + 1]
-                top_stack = self.reg[self.sp]
+                # top_stack = self.reg[self.sp]
 
-                value = self.ram[top_stack]
+                value = self.pop()
+                
                 self.reg[reg_num] = value
-                self.reg[self.sp] += 1
+                # self.reg[self.sp] += 1
                 
                 self.pc += 2
             
             elif  ir == PUSH:
-                self.reg[self.sp] -= 1
+                # self.reg[self.sp] -= 1
                 reg_num = self.ram[self.pc + 1]
                 value = self.reg[reg_num]
+                self.push(value)
 
 
-                top_stack = self.reg[self.sp]
-                self.ram[top_stack] = value
+                # top_stack = self.reg[self.sp]
+                # self.ram[top_stack] = value
                 self.pc += 2
+            elif ir == CALL:
+                self.reg[self.sp] -= 1
+                stack_address = self.reg[self.sp]
+
+                return_address = self.pc + 2
+                self.ram_write(stack_address,return_address)
+                reg_num = self.ram_read(self.pc + 1)
+                self.pc = self.reg[reg_num]
+                # retun_add = self.pc + 2
+
+                # self.push(retun_add)
+
+                # reg_num = self.ram[self.pc + 1]
+                # value = self.reg[reg_num]
+                # self.pc = value
+            
+            elif ir == RET:
+                self.pc = self.ram_read(self.reg[self.sp])
+                self.reg[self.sp] += 1
 
 
 
